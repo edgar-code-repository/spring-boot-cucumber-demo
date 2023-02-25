@@ -9,9 +9,12 @@ import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +38,7 @@ public class BookSteps extends TestBase {
     }
 
     @Given("^that we have some new books$")
-    public void given_some_new_books() {
+    public void given_some_new_books() throws Throwable {
         log.info("Given some new books...");
 
         bookList = new ArrayList<>();
@@ -44,6 +47,7 @@ public class BookSteps extends TestBase {
         bookDTO.setId("1001");
         bookDTO.setTitle("Book 1001");
         bookDTO.setAuthor("author");
+        bookDTO.setYear(1991);
 
         bookList.add(bookDTO);
 
@@ -51,6 +55,7 @@ public class BookSteps extends TestBase {
         bookDTO.setId("1002");
         bookDTO.setTitle("Book 1002");
         bookDTO.setAuthor("author");
+        bookDTO.setYear(1992);
 
         bookList.add(bookDTO);
 
@@ -58,6 +63,7 @@ public class BookSteps extends TestBase {
         bookDTO.setId("1003");
         bookDTO.setTitle("Book 1003");
         bookDTO.setAuthor("author");
+        bookDTO.setYear(1993);
 
         bookList.add(bookDTO);
 
@@ -85,10 +91,11 @@ public class BookSteps extends TestBase {
                 HttpEntity<BookDTO> entity = new HttpEntity<>(book, headers);
                 ResponseEntity<BookResponse> bookResponse = restTemplate.exchange(urlAddBook, HttpMethod.POST, entity, BookResponse.class);
 
-                log.info("bookResponse status: " + bookResponse.getStatusCode().value());
-                if (bookResponse.getStatusCodeValue() != 201) {
+                log.info("book added response status: " + bookResponse.getStatusCode().value());
+                if (bookResponse.getStatusCodeValue() != HttpStatus.CREATED.value()) {
                     fail();
                 }
+                log.info("book id: " + bookResponse.getBody().getBookDTO().getId());
             }
         }
         else {
@@ -109,19 +116,24 @@ public class BookSteps extends TestBase {
     }
 
     @Then("^books are retrieved successfully$")
-    public void books_retrieved_successfully() {
+    public void books_retrieved_successfully() throws Throwable {
         log.info("Books retrieved succesfully...");
+
+        seCreaHeader();
 
         if (bookList != null && bookList.size() > 0) {
             for (BookDTO book: bookList) {
                 String urlGetBook = "http://localhost:8080/books/" + book.getId();
-                HttpEntity entity = new HttpEntity<>(null, null);
-                ResponseEntity<BookResponse> bookResponse = restTemplate.exchange(urlGetBook, HttpMethod.GET, null, BookResponse.class);
+                HttpEntity entity = new HttpEntity<>(null, headers);
+                ResponseEntity<BookResponse> bookResponse = restTemplate.exchange(urlGetBook, HttpMethod.GET, entity, BookResponse.class);
+                log.info("bookResponse status: " + bookResponse.getStatusCode().value());
 
-                if (bookResponse.getStatusCodeValue() != 200 ) {
+                if (bookResponse == null || bookResponse.getStatusCodeValue() != 200 ) {
                     fail();
                 }
                 else {
+                    log.info("Get book success...");
+                    assertThat(bookResponse.getBody() != null);
                     assertThat(bookResponse.getBody().getBookDTO() != null);
                     assertThat(bookResponse.getBody().getBookDTO().getId() == book.getId());
                 }
@@ -132,6 +144,11 @@ public class BookSteps extends TestBase {
             fail();
         }
 
+    }
+
+    private void seCreaHeader() {
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
     }
 
 }
