@@ -27,14 +27,15 @@ public class BookSteps extends TestBase {
     private List<BookDTO> bookList;
     private ResponseEntity<BookResponse> bookResponse;
 
-    @Given("^given a book with id \"([^\"]*)\" title \"([^\"]*)\" author \"([^\"]*)\"$")
-    public void given_a_new_book(String id, String title, String author) {
+    @Given("^given a book with id \"([^\"]*)\" title \"([^\"]*)\" author \"([^\"]*)\" and published in (\\d+)$")
+    public void given_a_new_book(String id, String title, String author, int year) throws Throwable {
         log.info("Given a new book with id: " + id);
 
         bookDTO = new BookDTO();
         bookDTO.setId(id);
         bookDTO.setTitle(title);
         bookDTO.setAuthor(author);
+        bookDTO.setYear(year);
     }
 
     @Given("^that we have some new books$")
@@ -102,6 +103,34 @@ public class BookSteps extends TestBase {
             fail();
         }
 
+    }
+
+    @When("^the book with id \"([^\"]*)\" title \"([^\"]*)\" author \"([^\"]*)\" and published in (\\d+) is updated$")
+    public void update_book(String id, String title, String author, int year) throws Throwable {
+        log.info("Update book with id : " + id);
+
+        bookDTO = new BookDTO();
+        bookDTO.setId(id);
+        bookDTO.setTitle(title);
+        bookDTO.setAuthor(author);
+        bookDTO.setYear(year);
+
+        String urlGetBook = "http://localhost:8080/books/" + bookDTO.getId();
+        seCreaHeader();
+
+        HttpEntity<BookDTO> entity = new HttpEntity<>(bookDTO, headers);
+        this.bookResponse = restTemplate.exchange(urlGetBook, HttpMethod.PUT, entity, BookResponse.class);
+    }
+
+    @When("^the book with id \"([^\"]*)\" is deleted$")
+    public void delete_book(String id) throws Throwable {
+        log.info("Delete book with id : " + id);
+
+        String urlGetBook = "http://localhost:8080/books/" + id;
+        seCreaHeader();
+
+        HttpEntity<BookDTO> entity = new HttpEntity<>(null, headers);
+        this.bookResponse = restTemplate.exchange(urlGetBook, HttpMethod.DELETE, entity, BookResponse.class);
     }
 
     @Then("^execution returns success with code (\\d+)$")
