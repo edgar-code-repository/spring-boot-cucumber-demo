@@ -10,11 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,7 +70,7 @@ public class BookSteps extends TestBase {
 
     @When("^the book is added to the catalog$")
     public void a_book_is_added() {
-        String urlAddBook = "http://localhost:8080/books";
+        String urlAddBook = baseUrl;
         log.info("A book is added calling url: " + urlAddBook);
 
         HttpEntity<BookDTO> entity = new HttpEntity<>(bookDTO, null);
@@ -83,7 +81,7 @@ public class BookSteps extends TestBase {
     public void books_are_added() {
         log.info("Books are added...");
 
-        String urlAddBook = "http://localhost:8080/books";
+        String urlAddBook = baseUrl;
 
         if (bookList != null && bookList.size() > 0) {
             log.info("Books size: " + bookList.size());
@@ -115,7 +113,7 @@ public class BookSteps extends TestBase {
         bookDTO.setAuthor(author);
         bookDTO.setYear(year);
 
-        String urlGetBook = "http://localhost:8080/books/" + bookDTO.getId();
+        String urlGetBook = baseUrl + "/" + bookDTO.getId();
         seCreaHeader();
 
         HttpEntity<BookDTO> entity = new HttpEntity<>(bookDTO, headers);
@@ -126,7 +124,7 @@ public class BookSteps extends TestBase {
     public void delete_book(String id) throws Throwable {
         log.info("Delete book with id : " + id);
 
-        String urlGetBook = "http://localhost:8080/books/" + id;
+        String urlGetBook = baseUrl + "/" + id;
         seCreaHeader();
 
         HttpEntity<BookDTO> entity = new HttpEntity<>(null, headers);
@@ -152,7 +150,7 @@ public class BookSteps extends TestBase {
 
         if (bookList != null && bookList.size() > 0) {
             for (BookDTO book: bookList) {
-                String urlGetBook = "http://localhost:8080/books/" + book.getId();
+                String urlGetBook = baseUrl + "/" + book.getId();
                 HttpEntity entity = new HttpEntity<>(null, headers);
                 ResponseEntity<BookResponse> bookResponse = restTemplate.exchange(urlGetBook, HttpMethod.GET, entity, BookResponse.class);
                 log.info("bookResponse status: " + bookResponse.getStatusCode().value());
@@ -175,9 +173,5 @@ public class BookSteps extends TestBase {
 
     }
 
-    private void seCreaHeader() {
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-    }
 
 }
