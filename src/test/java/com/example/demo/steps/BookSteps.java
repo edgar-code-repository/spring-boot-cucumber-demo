@@ -36,7 +36,7 @@ public class BookSteps extends TestBase {
         bookDTO.setYear(year);
     }
 
-    @Given("^that we have some new books$")
+    @Given("^given that we have some new books$")
     public void given_some_new_books() throws Throwable {
         log.info("Given some new books...");
 

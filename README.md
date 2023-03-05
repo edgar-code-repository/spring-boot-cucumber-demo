@@ -5,6 +5,8 @@ Behaviour driven development with Spring Boot and Cucumber.
 
 A few Cucumber examples are created to test Rest endpoints.
 
+![CucumberExecution](screenshots/cucumber_tests_execution.png)
+
 -----------------------------------------------------------------
 
 **Dependencies added to pom.xml file**
@@ -66,18 +68,21 @@ and contains the cucumber tests related to the **class BookController.java**
         Given given a book with id "101" title "Book A" author "John Doe" and published in 1980
         When  the book is added to the catalog
         Then  execution returns success with code 201
-                
+
+
         Scenario: Retrieve books from catalog
-        Given that we have some new books
+        Given given that we have some new books
         When  the books are added to the catalog
         Then  books are retrieved successfully
-        
+
+
         Scenario: Update book from catalog
         Given given a book with id "999" title "Book 999" author "John Doe" and published in 1985
         When the book is added to the catalog
         And the book with id "999" title "Book 999 update" author "John Doe" and published in 1984 is updated
         Then execution returns success with code 200
-        
+
+
         Scenario: Delete book from catalog
         Given given a book with id "999" title "Book 999" author "John Doe" and published in 1985
         When the book with id "999" is deleted

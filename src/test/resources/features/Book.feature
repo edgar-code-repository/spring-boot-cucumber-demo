@@ -7,7 +7,7 @@ Feature: Book feature
 
 
   Scenario: Retrieve books from catalog
-    Given that we have some new books
+    Given given that we have some new books
     When  the books are added to the catalog
     Then  books are retrieved successfully
 
